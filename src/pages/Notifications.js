@@ -7,14 +7,66 @@ const Notifications = () => {
     const [lowStockItems, setLowStockItems] = useState([]);
 
     useEffect(() => {
-        // You can fetch these items from an API
-        const items = [
-            { name: 'Milk', quantity: '1 gallon', daysLeft: 4, image: './items/milks.jpg' },
-            { name: 'Banana', quantity: '2 bananas', daysLeft: 1, image: './items/banana.jpg' },
-            // Add other low stock items here
-        ];
+        // Fetch real-time items from the API (same as in FridgeAI)
+        const fetchRealTimeItems = async () => {
+            try {
+                const response = await fetch('https://fridgevision-backend.onrender.com/api/real-time-items');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
 
-        setLowStockItems(items); // Set the items as low stock items
+                // Filter out items with 0 count (out of stock)
+                const zeroStockItems = data.filter(item => item.count === 0);
+
+                const mappedItems = zeroStockItems.map(item => {
+                    let category = '';
+                    let image = '';
+
+                    // Check which item it is and assign category and image
+                    if (item.item === 'Banana') {
+                        category = 'Fruit';
+                        image = './items/banana.jpg'; // Image for Banana
+                    } else if (item.item === 'Tomato') {
+                        category = 'Fruit';
+                        image = './items/tomato.jpg'; // Image for Tomato
+                    } else if (item.item === 'Egg') {
+                        category = 'Protein';
+                        image = './items/eggs.jpg'; // Image for Eggs
+                    } else if (item.item === 'Milk') {
+                        category = 'Dairy';
+                        image = './items/milks.jpg'; // Image for Milk
+                    } else if (item.item === 'Spinach') {
+                        category = 'Vegetable';
+                        image = './items/spinach.jpg'; // Image for Spinach
+                    } else if (item.item === 'Potato') {
+                        category = 'Vegetable';
+                        image = './items/potato.jpg'; // Image for Potato
+                    } else if (item.item === 'Bread') {
+                        category = 'All';
+                        image = './items/bread.jpg'; // Image for Bread
+                    } else {
+                        // Default fallback image for any other items
+                        category = 'Unknown';
+                        image = './items/default.jpg';
+                    }
+
+                    return {
+                        name: item.item,
+                        quantity: `${item.count} left`,
+                        image: image,
+                        category: category, // Added category for reference
+                        daysLeft: 0, // You can add an expiry date if available
+                    };
+                });
+
+                setLowStockItems(mappedItems); // Set the items as low stock items
+            } catch (error) {
+                console.error('Error fetching real-time items:', error);
+            }
+        };
+
+        fetchRealTimeItems(); // Fetch the items when the component mounts
     }, []);
 
     return (
@@ -46,13 +98,13 @@ const Notifications = () => {
                 <div>
                     <h3 className="text-red-600 font-semibold">Low in Stock</h3>
                     <p className="text-sm text-gray-600">
-                        You have {lowStockItems.length} item{lowStockItems.length > 1 ? 's' : ''} that are low in stock. Tap to see the list.
+                        You have {lowStockItems.length} item{lowStockItems.length > 1 ? 's' : ''} out of stock.
                     </p>
                 </div>
             </div>
 
             {/* Detailed List of Low Stock Items */}
-            <h2 className="text-lg font-semibold mb-4">In Your Fridge</h2>
+            <h2 className="text-lg font-semibold mb-4">Out of Stock Items</h2>
             <div className="space-y-4">
                 {lowStockItems.length > 0 ? (
                     lowStockItems.map((item, index) => (
@@ -71,7 +123,7 @@ const Notifications = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-gray-500">No items are low in stock.</p>
+                    <p className="text-gray-500">No items are out of stock.</p>
                 )}
             </div>
         </div>
