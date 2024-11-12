@@ -117,7 +117,7 @@ const Notifications = () => {
                             <div>
                                 <h3 className="text-md font-semibold">{item.name}</h3>
                                 <p className="text-sm text-gray-500">
-                                    {item.quantity}, expires in {item.daysLeft} day{item.daysLeft > 1 ? 's' : ''}
+                                    {item.quantity}
                                 </p>
                             </div>
                         </div>
