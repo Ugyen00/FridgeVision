@@ -8,7 +8,7 @@ const Navbar = () => {
         // Fetch low-stock items from the API
         const fetchOutOfStockItems = async () => {
             try {
-                const response = await fetch('https://fridgevision-backend.onrender.com/api/real-time-items');
+                const response = await fetch('https://fridgevision-backend-u8pk.onrender.com/api/real-time-items');
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
